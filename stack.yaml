@@ -1,5 +1,10 @@
 resolver: lts-16.8
 packages:
-  - servant-swagger-ui/
-  - servant-swagger-ui-core/
-  - servant-swagger-ui-example/
+  - servant-openapi-ui
+  - servant-openapi-ui-core
+  - servant-openapi-ui-example
+extra-deps:
+  - openapi3-3.0.0.1
+  - servant-0.17
+  - servant-openapi3-2.0.1.0
+  - servant-server-0.17

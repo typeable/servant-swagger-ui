@@ -10,7 +10,7 @@
 {-# LANGUAGE UndecidableInstances       #-}
 -----------------------------------------------------------------------------
 --
--- Provides 'SwaggerUI' and corresponding 'swaggerUIServer' to embed
+-- Provides 'OpenApiUI' and corresponding 'openApiUIServer' to embed
 -- <http://swagger.io/swagger-ui/ swagger ui> into the application.
 --
 -- All of UI files are embedded into the binary.
@@ -22,32 +22,32 @@
 -- type BasicAPI = Get '[PlainText, JSON] Text
 --     :\<|> "cat" :> Capture ":name" CatName :> Get '[JSON] Cat
 --
--- -- | API type with bells and whistles, i.e. schema file and swagger-ui.
--- type API = 'SwaggerSchemaUI' "swagger-ui" "swagger.json"
+-- -- | API type with bells and whistles, i.e. schema file and openapi-ui.
+-- type API = 'OpenApiSchemaUI' "openapi-ui" "openapi.json"
 --     :\<|> BasicAPI
 --
 -- -- | Servant server for an API
 -- server :: Server API
--- server = 'swaggerSchemaUIServer' swaggerDoc
+-- server = 'openApiSchemaUIServer' openApiDoc
 --     :\<|> (pure "Hello World" :\<|> catEndpoint)
 --   where
 --     catEndpoint name = pure $ Cat name False
 -- @
 
-module Servant.Swagger.UI.Core (
-    -- * Swagger UI API
-    SwaggerSchemaUI,
-    SwaggerSchemaUI',
+module Servant.OpenApi.UI.Core (
+    -- * OpenApi UI API
+    OpenApiSchemaUI,
+    OpenApiSchemaUI',
 
     -- * Implementation details
-    SwaggerUiHtml(..),
-    swaggerSchemaUIServerImpl,
-    swaggerSchemaUIServerImpl',
+    OpenApiUiHtml(..),
+    openApiSchemaUIServerImpl,
+    openApiSchemaUIServerImpl',
     Handler,
     ) where
 
 import Data.ByteString                (ByteString)
-import Data.Swagger                   (Swagger)
+import Data.OpenApi                   (OpenApi)
 import GHC.TypeLits                   (KnownSymbol, Symbol, symbolVal)
 import Network.Wai.Application.Static (embeddedSettings, staticApp)
 import Servant
@@ -56,65 +56,65 @@ import Text.Blaze                     (ToMarkup (..))
 
 import qualified Data.Text as T
 
--- | Swagger schema + ui api.
+-- | OpenAPI schema + ui api.
 --
--- @SwaggerSchemaUI "swagger-ui" "swagger.json"@ will result into following hierarchy:
+-- @openApiSchemaUI "openapi-ui" "openapi.json"@ will result into following hierarchy:
 --
 -- @
--- \/swagger.json
--- \/swagger-ui
--- \/swagger-ui\/index.html
--- \/swagger-ui\/...
+-- \/openapi.json
+-- \/openapi-ui
+-- \/openapi-ui\/index.html
+-- \/openapi-ui\/...
 -- @
 --
-type SwaggerSchemaUI (dir :: Symbol) (schema :: Symbol) =
-    SwaggerSchemaUI' dir (schema :> Get '[JSON] Swagger)
+type OpenApiSchemaUI (dir :: Symbol) (schema :: Symbol) =
+    OpenApiSchemaUI' dir (schema :> Get '[JSON] OpenApi)
 
--- | Use 'SwaggerSchemaUI'' when you need even more control over
--- where @swagger.json@ is served (e.g. subdirectory).
-type SwaggerSchemaUI' (dir :: Symbol) (api :: *) =
+-- | Use 'OpenApiSchemaUI'' when you need even more control over
+-- where @openapi.json@ is served (e.g. subdirectory).
+type OpenApiSchemaUI' (dir :: Symbol) (api :: *) =
     api
     :<|> dir :>
-        ( Get '[HTML] (SwaggerUiHtml dir api)
-        :<|> "index.html" :> Get '[HTML] (SwaggerUiHtml dir api)
+        ( Get '[HTML] (OpenApiUiHtml dir api)
+        :<|> "index.html" :> Get '[HTML] (OpenApiUiHtml dir api)
         :<|> Raw
         )
 
--- | Index file for swagger ui.
+-- | Index file for OpenAPI ui.
 --
--- It's configured by the location of swagger schema and directory it lives under.
+-- It's configured by the location of OpenAPI schema and directory it lives under.
 --
 -- Implementation detail: the @index.html@ is prepopulated with parameters
 -- to find schema file automatically.
-data SwaggerUiHtml (dir :: Symbol) (api :: *) = SwaggerUiHtml T.Text
+data OpenApiUiHtml (dir :: Symbol) (api :: *) = OpenApiUiHtml T.Text
 
 instance (KnownSymbol dir, HasLink api, Link ~ MkLink api Link, IsElem api api)
-    => ToMarkup (SwaggerUiHtml dir api)
+    => ToMarkup (OpenApiUiHtml dir api)
   where
-    toMarkup (SwaggerUiHtml template) = preEscapedToMarkup
-        $ T.replace "SERVANT_SWAGGER_UI_SCHEMA" schema
-        $ T.replace "SERVANT_SWAGGER_UI_DIR" dir
+    toMarkup (OpenApiUiHtml template) = preEscapedToMarkup
+        $ T.replace "SERVANT_OPENAPI_UI_SCHEMA" schema
+        $ T.replace "SERVANT_OPENAPI_UI_DIR" dir
         $ template
       where
         schema = T.pack $ uriPath . linkURI $ safeLink proxyApi proxyApi
         dir    = T.pack $ symbolVal (Proxy :: Proxy dir)
         proxyApi = Proxy :: Proxy api
 
-swaggerSchemaUIServerImpl
-    :: (Server api ~ Handler Swagger)
+openApiSchemaUIServerImpl
+    :: (Server api ~ Handler OpenApi)
     => T.Text -> [(FilePath, ByteString)]
-    -> Swagger -> Server (SwaggerSchemaUI' dir api)
-swaggerSchemaUIServerImpl indexTemplate files swagger
-  = swaggerSchemaUIServerImpl' indexTemplate files $ return swagger
+    -> OpenApi -> Server (OpenApiSchemaUI' dir api)
+openApiSchemaUIServerImpl indexTemplate files openapi
+  = openApiSchemaUIServerImpl' indexTemplate files $ return openapi
 
--- | Use a custom server to serve the Swagger spec source.
-swaggerSchemaUIServerImpl'
+-- | Use a custom server to serve the OpenApi spec source.
+openApiSchemaUIServerImpl'
     :: T.Text -> [(FilePath, ByteString)]
-    -> Server api -> Server (SwaggerSchemaUI' dir api)
-swaggerSchemaUIServerImpl' indexTemplate files server
+    -> Server api -> Server (OpenApiSchemaUI' dir api)
+openApiSchemaUIServerImpl' indexTemplate files server
        = server
-    :<|> return (SwaggerUiHtml indexTemplate)
-    :<|> return (SwaggerUiHtml indexTemplate)
+    :<|> return (OpenApiUiHtml indexTemplate)
+    :<|> return (OpenApiUiHtml indexTemplate)
     :<|> rest
   where
     rest = Tagged $ staticApp $ embeddedSettings files

@@ -25,11 +25,11 @@ import Network.Wai        (Application)
 import System.Environment (getArgs, lookupEnv)
 import Text.Read          (readMaybe)
 
-import Data.Swagger
+import Data.OpenApi hiding (Server)
 import Servant
-import Servant.Swagger
-import Servant.Swagger.UI
-import Servant.Swagger.UI.Core
+import Servant.OpenApi.UI
+import Servant.OpenApi
+import Servant.OpenApi.UI.Core
 
 import qualified Network.Wai.Handler.Warp as Warp
 
@@ -62,7 +62,7 @@ newtype CatName = CatName Text
 instance IsString CatName where
     fromString = CatName . fromString
 
--- swagger instances
+-- openapi instances
 instance ToJSON Cat
 instance ToJSON CatName
 instance FromJSON Cat
@@ -133,14 +133,14 @@ type BasicAPI = Get '[PlainText, JSON] Text
     :<|> SUMMARY("Post endpoint") "post-cat" :> ReqBody '[JSON] Cat :> Post '[JSON] Cat
 
 type API =
-    -- this serves both: swagger.json and swagger-ui
-    SwaggerSchemaUI "swagger-ui" "swagger.json"
+    -- this serves both: openapi.json and openapi-ui
+    OpenApiSchemaUI "openapi-ui" "openapi.json"
     :<|> BasicAPI
 
 -- To test nested case
 type API' = API
     :<|> "nested" :> API
-    :<|> SwaggerSchemaUI' "foo-ui" ("foo" :> "swagger.json" :> Get '[JSON] Swagger)
+    :<|> OpenApiSchemaUI' "foo-ui" ("foo" :> "openapi.json" :> Get '[JSON] OpenApi)
 
 -- Implementation
 
@@ -154,11 +154,11 @@ data Variant
 server' :: Server API'
 server' = server Normal
     :<|> server Nested
-    :<|> schemaUiServer (swaggerDoc' SpecDown)
+    :<|> schemaUiServer (openapiDoc' SpecDown)
   where
     server :: Variant -> Server API
     server variant =
-        schemaUiServer (swaggerDoc' variant)
+        schemaUiServer (openapiDoc' variant)
         :<|> (return "Hello World" :<|> catEndpoint' :<|> catEndpoint :<|> catEndpoint :<|> return)
       where
         catEndpoint' n _ _ = return $ Cat n (variant == Normal)
@@ -166,24 +166,23 @@ server' = server Normal
         -- Unfortunately we have to specify the basePath manually atm.
 
     schemaUiServer
-        :: (Server api ~ Handler Swagger)
-        => Swagger -> Server (SwaggerSchemaUI' dir api)
-    schemaUiServer = swaggerSchemaUIServer
+        :: (Server api ~ Handler OpenApi)
+        => OpenApi -> Server (OpenApiSchemaUI' dir api)
+    schemaUiServer = openApiSchemaUIServer
 
-    swaggerDoc' Normal    = swaggerDoc
-    swaggerDoc' Nested    = swaggerDoc
-        & basePath ?~ "/nested"
+    openapiDoc' Normal    = openapiDoc
+    openapiDoc' Nested    = openapiDoc
         & info.description ?~ "Nested API"
-    swaggerDoc' SpecDown  = swaggerDoc
+    openapiDoc' SpecDown  = openapiDoc
         & info.description ?~ "Spec nested"
 
 -- Boilerplate
 
-swaggerDoc :: Swagger
-swaggerDoc = toSwagger (Proxy :: Proxy BasicAPI)
+openapiDoc :: OpenApi
+openapiDoc = toOpenApi (Proxy :: Proxy BasicAPI)
     & info.title       .~ "Cats API"
     & info.version     .~ "2016.8.7"
-    & info.description ?~ "This is an API that tests servant-swagger support"
+    & info.description ?~ "This is an API that tests servant-openapi support"
 
 api :: Proxy API'
 api = Proxy

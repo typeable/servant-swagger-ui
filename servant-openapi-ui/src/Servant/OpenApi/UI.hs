@@ -12,13 +12,13 @@
 {-# LANGUAGE UndecidableInstances       #-}
 -----------------------------------------------------------------------------
 -- |
--- Module      :  Servant.Swagger.UI
+-- Module      :  Servant.OpenApi.UI
 -- Copyright   :  (C) 2016-2018 Oleg Grenrus
 -- License     :  BSD-3-Clause
 -- Maintainer  :  Oleg Grenrus <oleg.grenrus@iki.fi>
 --
--- Provides 'SwaggerUI' and corresponding 'swaggerSchemaUIServer' to embed
--- <http://swagger.io/swagger-ui/ swagger ui> into the application.
+-- Provides 'OpenApiSchemaUI' and corresponding 'openApiSchemaUIServer' to embed
+-- <http://swagger.io/swagger-ui/ Swagger UI> into the application.
 --
 -- All of the UI files are embedded into the binary.
 --
@@ -30,61 +30,61 @@
 --     :\<|> "cat" :> Capture ":name" CatName :> Get '[JSON] Cat
 --
 -- -- | API type with bells and whistles, i.e. schema file and swagger-ui.
--- type API = 'SwaggerSchemaUI' "swagger-ui" "swagger.json"
+-- type API = 'OpenApiSchemaUI' "openapi-ui" "openapi.json"
 --     :\<|> BasicAPI
 --
 -- -- | Servant server for an API
 -- server :: Server API
--- server = 'swaggerSchemaUIServer' swaggerDoc
+-- server = 'openApiSchemaUIServer' openApiDoc
 --     :\<|> (pure "Hello World" :\<|> catEndpoint)
 --   where
 --     catEndpoint name = pure $ Cat name False
 -- @
 
-module Servant.Swagger.UI (
-    -- * Swagger UI API
-    SwaggerSchemaUI,
-    SwaggerSchemaUI',
-    swaggerSchemaUIServer,
-    swaggerSchemaUIServer',
+module Servant.OpenApi.UI (
+    -- * OpenApi UI API
+    OpenApiSchemaUI,
+    OpenApiSchemaUI',
+    openApiSchemaUIServer,
+    openApiSchemaUIServer',
 
-    -- ** Official swagger ui
-    swaggerUiIndexTemplate,
-    swaggerUiFiles,
+    -- ** Official OpenAPI ui
+    openApiUiIndexTemplate,
+    openApiUiFiles,
     ) where
 
-import Servant.Swagger.UI.Core
+import Servant.OpenApi.UI.Core
 
 import Data.ByteString (ByteString)
-import Data.Swagger    (Swagger)
+import Data.OpenApi    (OpenApi)
 import Data.Text       (Text)
 import FileEmbedLzma
 import Servant
 
--- | Serve Swagger UI on @/dir@ using @api@ as a Swagger spec source.
+-- | Serve OpenApi UI on @/dir@ using @api@ as a OpenApi spec source.
 --
 -- @
--- swaggerSchemaUIServer :: Swagger -> Server (SwaggerSchemaUI schema dir)
+-- openApiSchemaUIServer :: OpenApi -> Server (OpenApiSchemaUI schema dir)
 -- @
-swaggerSchemaUIServer
-    :: (Server api ~ Handler Swagger)
-    => Swagger -> Server (SwaggerSchemaUI' dir api)
-swaggerSchemaUIServer =
-    swaggerSchemaUIServerImpl swaggerUiIndexTemplate swaggerUiFiles
+openApiSchemaUIServer
+    :: (Server api ~ Handler OpenApi)
+    => OpenApi -> Server (OpenApiSchemaUI' dir api)
+openApiSchemaUIServer =
+    openApiSchemaUIServerImpl openApiUiIndexTemplate openApiUiFiles
 
--- | Use a custom server to serve the Swagger spec source.
+-- | Use a custom server to serve the OpenApi spec source.
 --
 -- This allows even more control over how the spec source is served.
 -- It allows, for instance, serving the spec source with authentication,
--- customizing the response based on the client or serving a swagger.yaml
+-- customizing the response based on the client or serving a openapi.yaml
 -- instead.
-swaggerSchemaUIServer'
-    :: Server api -> Server (SwaggerSchemaUI' dir api)
-swaggerSchemaUIServer' =
-    swaggerSchemaUIServerImpl' swaggerUiIndexTemplate swaggerUiFiles
+openApiSchemaUIServer'
+    :: Server api -> Server (OpenApiSchemaUI' dir api)
+openApiSchemaUIServer' =
+    openApiSchemaUIServerImpl' openApiUiIndexTemplate openApiUiFiles
 
-swaggerUiIndexTemplate :: Text
-swaggerUiIndexTemplate = $(embedText "index.html.tmpl")
+openApiUiIndexTemplate :: Text
+openApiUiIndexTemplate = $(embedText "index.html.tmpl")
 
-swaggerUiFiles :: [(FilePath, ByteString)]
-swaggerUiFiles = $(embedRecursiveDir "swagger-ui-dist-3.36.1")
+openApiUiFiles :: [(FilePath, ByteString)]
+openApiUiFiles = $(embedRecursiveDir "swagger-ui-dist-3.36.1")
