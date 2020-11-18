@@ -1,0 +1,5 @@
+resolver: lts-16.8
+packages:
+  - servant-swagger-ui/
+  - servant-swagger-ui-core/
+  - servant-swagger-ui-example/

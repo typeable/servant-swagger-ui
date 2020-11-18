@@ -6,3 +6,4 @@ dist-newstyle/
 cabal.sandbox.config
 src/highlight.js
 src/style.css
+stack.yaml.lock
