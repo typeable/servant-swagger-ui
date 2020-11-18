@@ -30,8 +30,6 @@ import Servant
 import Servant.Swagger
 import Servant.Swagger.UI
 import Servant.Swagger.UI.Core
-import Servant.Swagger.UI.JensOleG
-import Servant.Swagger.UI.ReDoc
 
 import qualified Network.Wai.Handler.Warp as Warp
 
@@ -153,14 +151,8 @@ data Variant
     | SpecDown
     deriving (Eq)
 
-data UIFlavour
-    = Original
-    | JensOleG
-    | ReDoc
-    deriving (Eq)
-
-server' :: UIFlavour -> Server API'
-server' uiFlavour = server Normal
+server' :: Server API'
+server' = server Normal
     :<|> server Nested
     :<|> schemaUiServer (swaggerDoc' SpecDown)
   where
@@ -176,10 +168,7 @@ server' uiFlavour = server Normal
     schemaUiServer
         :: (Server api ~ Handler Swagger)
         => Swagger -> Server (SwaggerSchemaUI' dir api)
-    schemaUiServer = case uiFlavour of
-        Original -> swaggerSchemaUIServer
-        JensOleG -> jensolegSwaggerSchemaUIServer
-        ReDoc    -> redocSchemaUIServer
+    schemaUiServer = swaggerSchemaUIServer
 
     swaggerDoc' Normal    = swaggerDoc
     swaggerDoc' Nested    = swaggerDoc
@@ -199,15 +188,8 @@ swaggerDoc = toSwagger (Proxy :: Proxy BasicAPI)
 api :: Proxy API'
 api = Proxy
 
-app :: UIFlavour -> Application
-app = serve api . server'
-
 main :: IO ()
 main = do
-    args <- getArgs
-    let uiFlavour | "jensoleg" `elem` args = JensOleG
-                  | "redoc"    `elem` args = ReDoc
-                  | otherwise              = Original
     p <- fromMaybe 8000 . (>>= readMaybe) <$> lookupEnv "PORT"
     putStrLn $ "http://localhost:" ++ show p ++ "/"
-    Warp.run p (app uiFlavour)
+    Warp.run p $ serve api server'

@@ -38,8 +38,6 @@ executable servant-swagger-ui-example
     , servant-swagger
     , servant-swagger-ui
     , servant-swagger-ui-core
-    , servant-swagger-ui-jensoleg
-    , servant-swagger-ui-redoc
     , swagger2
     , text
     , wai                          >=3.0.3.0  && <3.3

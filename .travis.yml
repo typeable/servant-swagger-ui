@@ -104,27 +104,19 @@ install:
     echo "packages: servant-swagger-ui" >> cabal.project
     echo "packages: servant-swagger-ui-core" >> cabal.project
     echo "packages: servant-swagger-ui-example" >> cabal.project
-    echo "packages: servant-swagger-ui-jensoleg" >> cabal.project
-    echo "packages: servant-swagger-ui-redoc" >> cabal.project
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package servant-swagger-ui' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package servant-swagger-ui-core' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package servant-swagger-ui-example' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
-  - if [ $HCNUMVER -ge 80200 ] ; then echo 'package servant-swagger-ui-jensoleg' >> cabal.project ; fi
-  - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
-  - if [ $HCNUMVER -ge 80200 ] ; then echo 'package servant-swagger-ui-redoc' >> cabal.project ; fi
-  - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
   - |
-  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(servant-swagger-ui|servant-swagger-ui-core|servant-swagger-ui-example|servant-swagger-ui-jensoleg|servant-swagger-ui-redoc)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
+  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(servant-swagger-ui|servant-swagger-ui-core|servant-swagger-ui-example)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
   - cat cabal.project || true
   - cat cabal.project.local || true
   - if [ -f "servant-swagger-ui/configure.ac" ]; then (cd "servant-swagger-ui" && autoreconf -i); fi
   - if [ -f "servant-swagger-ui-core/configure.ac" ]; then (cd "servant-swagger-ui-core" && autoreconf -i); fi
   - if [ -f "servant-swagger-ui-example/configure.ac" ]; then (cd "servant-swagger-ui-example" && autoreconf -i); fi
-  - if [ -f "servant-swagger-ui-jensoleg/configure.ac" ]; then (cd "servant-swagger-ui-jensoleg" && autoreconf -i); fi
-  - if [ -f "servant-swagger-ui-redoc/configure.ac" ]; then (cd "servant-swagger-ui-redoc" && autoreconf -i); fi
   - ${CABAL} v2-freeze $WITHCOMPILER ${TEST} ${BENCH}
   - "cat cabal.project.freeze | sed -E 's/^(constraints: *| *)//' | sed 's/any.//'"
   - rm  cabal.project.freeze
@@ -142,8 +134,6 @@ script:
   - PKGDIR_servant_swagger_ui="$(find . -maxdepth 1 -type d -regex '.*/servant-swagger-ui-[0-9.]*')"
   - PKGDIR_servant_swagger_ui_core="$(find . -maxdepth 1 -type d -regex '.*/servant-swagger-ui-core-[0-9.]*')"
   - PKGDIR_servant_swagger_ui_example="$(find . -maxdepth 1 -type d -regex '.*/servant-swagger-ui-example-[0-9.]*')"
-  - PKGDIR_servant_swagger_ui_jensoleg="$(find . -maxdepth 1 -type d -regex '.*/servant-swagger-ui-jensoleg-[0-9.]*')"
-  - PKGDIR_servant_swagger_ui_redoc="$(find . -maxdepth 1 -type d -regex '.*/servant-swagger-ui-redoc-[0-9.]*')"
   # Generate cabal.project
   - rm -rf cabal.project cabal.project.local cabal.project.freeze
   - touch cabal.project
@@ -151,20 +141,14 @@ script:
     echo "packages: ${PKGDIR_servant_swagger_ui}" >> cabal.project
     echo "packages: ${PKGDIR_servant_swagger_ui_core}" >> cabal.project
     echo "packages: ${PKGDIR_servant_swagger_ui_example}" >> cabal.project
-    echo "packages: ${PKGDIR_servant_swagger_ui_jensoleg}" >> cabal.project
-    echo "packages: ${PKGDIR_servant_swagger_ui_redoc}" >> cabal.project
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package servant-swagger-ui' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package servant-swagger-ui-core' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
   - if [ $HCNUMVER -ge 80200 ] ; then echo 'package servant-swagger-ui-example' >> cabal.project ; fi
   - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
-  - if [ $HCNUMVER -ge 80200 ] ; then echo 'package servant-swagger-ui-jensoleg' >> cabal.project ; fi
-  - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
-  - if [ $HCNUMVER -ge 80200 ] ; then echo 'package servant-swagger-ui-redoc' >> cabal.project ; fi
-  - "if [ $HCNUMVER -ge 80200 ] ; then echo '  ghc-options: -Werror=missing-methods' >> cabal.project ; fi"
   - |
-  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(servant-swagger-ui|servant-swagger-ui-core|servant-swagger-ui-example|servant-swagger-ui-jensoleg|servant-swagger-ui-redoc)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
+  - "for pkg in $($HCPKG list --simple-output); do echo $pkg | sed 's/-[^-]*$//' | (grep -vE -- '^(servant-swagger-ui|servant-swagger-ui-core|servant-swagger-ui-example)$' || true) | sed 's/^/constraints: /' | sed 's/$/ installed/' >> cabal.project.local; done"
   - cat cabal.project || true
   - cat cabal.project.local || true
   # Building...
@@ -177,8 +161,6 @@ script:
   - (cd ${PKGDIR_servant_swagger_ui} && ${CABAL} -vnormal check)
   - (cd ${PKGDIR_servant_swagger_ui_core} && ${CABAL} -vnormal check)
   - (cd ${PKGDIR_servant_swagger_ui_example} && ${CABAL} -vnormal check)
-  - (cd ${PKGDIR_servant_swagger_ui_jensoleg} && ${CABAL} -vnormal check)
-  - (cd ${PKGDIR_servant_swagger_ui_redoc} && ${CABAL} -vnormal check)
   # haddock...
   - ${CABAL} v2-haddock $WITHCOMPILER --with-haddock $HADDOCK ${TEST} ${BENCH} all
   # Building without installed constraints for packages in global-db...
