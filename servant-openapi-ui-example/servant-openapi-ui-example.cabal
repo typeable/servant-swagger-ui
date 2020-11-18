@@ -1,15 +1,14 @@
 cabal-version: 2.0
 name:          servant-openapi-ui-example
-version:       0
-synopsis:      servant-swagger-ui example
-category:      Web, Servant, Swagger
-description:   A kind of test-suite of servant-swagger-ui
-homepage:      https://github.com/haskell-servant/servant-swagger-ui
+version:       0.0.1.0
+synopsis:      Servant
+category:      Web, Servant, OpenAPI
+description:   A kind of test-suite of servant-openapi-ui
+homepage:      https://github.com/typeable/servant-swagger-ui
 bug-reports:
-  https://github.com/haskell-servant/servant-swagger-ui/issues
+  https://github.com/typeable/servant-swagger-ui/issues
 
 author:        Oleg Grenrus <oleg.grenrus@iki.fi>
-maintainer:    haskell-servant-maintainers@googlegroups.com
 license:       BSD3
 license-file:  LICENSE
 build-type:    Simple
@@ -23,7 +22,7 @@ tested-with:
 
 source-repository head
   type:     git
-  location: https://github.com/haskell-servant/servant-swagger-ui
+  location: https://github.com/typeable/servant-swagger-ui
 
 executable servant-openapi-ui-example
   main-is:          Main.hs

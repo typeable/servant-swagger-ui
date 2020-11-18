@@ -29,7 +29,7 @@
 -- type BasicAPI = Get '[PlainText, JSON] Text
 --     :\<|> "cat" :> Capture ":name" CatName :> Get '[JSON] Cat
 --
--- -- | API type with bells and whistles, i.e. schema file and swagger-ui.
+-- -- | API type with bells and whistles, i.e. schema file and openapi-ui.
 -- type API = 'OpenApiSchemaUI' "openapi-ui" "openapi.json"
 --     :\<|> BasicAPI
 --

@@ -1,21 +1,19 @@
 cabal-version:      1.12
 name:               servant-openapi-ui-core
-version:            0.3.3
-x-revision:         4
+version:            0.0.1.0
+x-revision:         0
 synopsis:           Servant OpenApi ui core components
-category:           Web, Servant, OpenApi
+category:           Web, Servant, OpenAPI
 description:
   Provide embedded OpenApi UI for servant and OpenApi (i.e. servant-openapi3)
   .
-  See servant-openapi3-ui, servant-openapi3-ui-jensoleg or
-  servant-openapi3-ui-redoc for "concrete" implementations.
+  See servant-openapi3-ui for "concrete" implementations.
 
--- homepage:           https://github.com/haskell-servant/servant-swagger-ui
--- bug-reports:
---   https://github.com/haskell-servant/servant-openapi3-ui/issues
+homepage:           https://github.com/typeable/servant-swagger-ui
+bug-reports:
+  https://github.com/typeable/servant-swagger-ui/issues
 
--- author:             Oleg Grenrus <oleg.grenrus@iki.fi>
--- maintainer:         haskell-servant-maintainers@googlegroups.com
+author:             Oleg Grenrus <oleg.grenrus@iki.fi>
 license:            BSD3
 license-file:       LICENSE
 build-type:         Simple
@@ -27,11 +25,11 @@ tested-with:
    || ==8.8.4
    || ==8.10.2
 
-extra-source-files: Changelog.md
+extra-source-files: CHANGELOG.md
 
--- source-repository head
---   type:     git
---   location: https://github.com/haskell-servant/servant-swagger-ui
+source-repository head
+  type:     git
+  location: https://github.com/typeable/servant-swagger-ui
 
 library
   hs-source-dirs:   src

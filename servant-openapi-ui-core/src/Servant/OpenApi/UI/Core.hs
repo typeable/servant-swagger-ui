@@ -11,7 +11,7 @@
 -----------------------------------------------------------------------------
 --
 -- Provides 'OpenApiUI' and corresponding 'openApiUIServer' to embed
--- <http://swagger.io/swagger-ui/ swagger ui> into the application.
+-- <http://swagger.io/swagger-ui/ Swagger UI> into the application.
 --
 -- All of UI files are embedded into the binary.
 --
